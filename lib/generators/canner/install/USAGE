@@ -1,0 +1,2 @@
+Description:
+    Generates the canner base policy.  All your policies need to inherit from this policy.
