@@ -86,6 +86,7 @@ end
 ### canner_scope
 
 The canner_scope method is used to scope the models consistently in your app.
+
 For example in my app the Customers controller uses the canner_scope to
 ensure only Users from the current_company are displayed.
 
@@ -153,10 +154,11 @@ can?(:something_random, :customer)
 ```
 
 In english the can method is saying:
+
 Can the currently signed in user access the something_random action?  Oh, and by the way please
 use the CustomerPolicy's can? method to do the checking.
 
-can?(:something_random, :user) would use the ... you guessed it UserPolicy's can? method.
+`can?(:something_random, :user)` would use the ... you guessed it UserPolicy's can? method.
 
 ### Force the Use of Policies
 
@@ -183,7 +185,7 @@ for the index to be strictly enforced.
 When a user does stumble onto something they don't have access to you'll want to politely
 tell them about it and direct the app flow as you see fit.
 
-Do accomplish this in your application_controller.rb add
+To accomplish this in your application_controller.rb add
 
 ``` ruby
   rescue_from Canner::NotAuthorizedError, with: :user_not_authorized
