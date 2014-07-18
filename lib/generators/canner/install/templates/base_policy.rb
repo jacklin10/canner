@@ -11,7 +11,7 @@ class BasePolicy
   # expects an array or strings or symbols that represent the user roles
   def fetch_roles
     raise ArgumentError.new("YOU NEED TO IMPLEMENT")
-    # ex. User.roles
+    # ex. @current_user.roles
   end
 
   # implement in your policy class to auto scope in an action
