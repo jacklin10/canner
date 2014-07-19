@@ -83,9 +83,37 @@ def can?
 end
 ```
 
+### Base Policy
+
+After you run the install generator you'll see the base_policy.rb in your app
+under the policies directory.
+
+The implemenation for these methods is up to you.  You'll find its much easier
+to do than you might think, and because there isn't tons of ruby magic its more readable.
+
+### fetch_roles
+
+This method is how you feed your apps roles into canner so they can be checked against.
+You'll need the roles returned in an array.  This will likely be something like:
+
+``` ruby
+def fetch_roles
+  @current_user.roles
+end
+
+```
+
+However if your role design is a little more complicated you can provide that in this method.
+
+This is likely the only method of the 3 that you'll implement in the base_policy.  The remaining
+methods will be implemented in the specific model policies.  Unless you want to default deny access in
+all policies.
+
 ### canner_scope
 
-The canner_scope method is used to scope the models consistently in your app.
+You'll want to implement this method for each of your model policies that extend from base_policy.rb.
+
+The canner_scope method is used to scope the authorized models consistently in your app.
 
 For example in my app the Customers controller uses the canner_scope to
 ensure only Users from the current_company are displayed.
@@ -129,9 +157,15 @@ class CustomerPolicy < BasePolicy
 end
 ```
 
+Now you don't really need to think about the auth logic when fetching a list of customers.
+Just make sure you use the policy and you'll only show the users what is intended.
+
+Also if your policy changes at some point its a one place fix.
+
 ### can?
 
 You probably recognize this method from Ryan Bates' cancan gem.  The idea is the same as well.
+You'll likely only implement this is your model policies as well.
 
 You use the can method to determine if the current_user is able to access an action or resource.
 
@@ -160,12 +194,22 @@ use the CustomerPolicy's can? method to do the checking.
 
 `can?(:something_random, :user)` would use the ... you guessed it UserPolicy's can? method.
 
+If you want to deny access by default across all model policies you could do something as simple as:
+
+``` ruby
+def can?
+  false
+end
+```
+
+in your base_policy's `can?` method
+
 ### Force the Use of Policies
 
 Also like Pundit you can force your app to use policies.
 I recommend you do this so you don't forget to wrap authorization about some of your resources.
 
-To make sure your controller actions are using the can? method add this to your
+To make sure your controller actions are using the can? method add this near the top of your
 application_controller.rb
 
 ``` ruby
