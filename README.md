@@ -91,6 +91,18 @@ under the policies directory.
 The implemenation for these methods is up to you.  You'll find its much easier
 to do than you might think, and because there isn't tons of ruby magic its more readable.
 
+By default the base_policy takes the current user, a branch and the method (aka action).
+You can easily change this to whatever you need.
+
+If your app just does the standard validate user against an action then you can remove the
+branch attribute.
+
+If your app needs to capture more information for use with validation that's fine too.
+Since you write the validation policy in plain ruby its easy to customize to suit your needs.
+
+Canner doesn't try to tell you what you need.  It just provides a guide to allow you
+to build whatever auth strategy works best for your requirements.
+
 ### fetch_roles
 
 This method is how you feed your apps roles into canner so they can be checked against.
@@ -224,6 +236,15 @@ after_action :ensure_scope, only: :index
 Note the use of only here.  You usually won't need the canner_scope on anything except
 for the index to be strictly enforced.
 
+If you would like to skip for a particular controller just add
+``` ruby
+skip_filter :ensure_scope
+```
+And / Or
+``` ruby
+skip_filter :ensure_auth
+```
+
 ### Handle Canner Authorization Failures
 
 When a user does stumble onto something they don't have access to you'll want to politely
@@ -272,4 +293,97 @@ would only be able to see the create customer link if they had an admin role.
   end
 ```
 
+### Testing
 
+Testing your policies isn't very difficult and it will vary a bit from app to app so I'll
+just show what I do as an example.
+
+The app I use canner for is using minitest so the examples will be using that instead of rspec.
+
+``` ruby
+
+require 'test_helper'
+include AuthMacros
+
+class UserPolicyTest < ActiveSupport::TestCase
+
+  describe UserPolicy do
+    let(:current_user) {users(:joe)}
+    let(:current_branch) { branches(:pittsburgh) }
+
+    describe 'canner_scope' do
+
+      it 'should return an empty user unless when not index method' do
+        policy = UserPolicy.new(current_user, current_branch, 'show')
+        assert_equal policy.canner_scope, User.none
+      end
+
+      it 'should return only users for the correct company' do
+        policy = UserPolicy.new(current_user, current_branch, 'index')
+        users = policy.canner_scope
+
+        assert_equal users.size, 1
+
+        policy = UserPolicy.new(current_user, monaca, 'index')
+        users = policy.canner_scope
+
+        assert_equal users.size, 0
+      end
+
+    end
+
+    describe 'can?' do
+
+      it 'should verify sysop access' do
+        allowed_methods = [:new, :index, :create, :update, :edit, :lookup_user, :selected_user]
+
+        policy_test(current_user, 'sysop', allowed_methods, 'user')
+      end
+
+    end
+
+  end
+
+end
+
+```
+
+I wrote a method ``` policy_test ``` in a module that I mix in.
+This makes it pretty easy to test all my policies quickly.
+
+I just want to make sure the policy allows access to only the actions I expect
+and denies access to those I don't expect.
+
+Here's what AuthMacro looks like:
+
+``` ruby
+
+module AuthMacros
+
+  def policy_test(user, rolename, allowed_actions, model_name, branch=user.active_branch)
+    all_actions = find_all_actions(model_name)
+
+    # Yours might be something like: user.role = rolename
+    user.grant!(rolename, branch)
+
+    allowed_actions.each do |method|
+      assert policy_can?(model_name, user, branch, method), "Not permitted to :#{method}, but test thinks it is"
+    end
+
+    (all_actions - allowed_actions).each do |method|
+      assert_not policy_can?(model_name, user, branch, method), "Permitted to :#{method}, but test doesn't expect it"
+    end
+
+  end
+
+  def policy_can?(model_name, user, branch, method)
+    "#{model_name.classify}Policy".constantize.send(:new, user, branch, method).can?
+  end
+
+  def find_all_actions(model_name)
+    "#{model_name.classify.pluralize(2)}Controller".constantize.send(:action_methods).map{|m| m.to_sym}
+  end
+
+end
+
+```

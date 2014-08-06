@@ -13,7 +13,7 @@ class Util
 
     # ensure given roles are in the form of an array
     def arrayify(roles)
-      roles.class == Array ? roles : [roles].flatten
+      Array.wrap(roles).flatten
     end
 
   end

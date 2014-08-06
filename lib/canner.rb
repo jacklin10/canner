@@ -5,7 +5,6 @@ module Canner
 
   extend ActiveSupport::Concern
 
-
   # so you don't have to have a helper method in the app_controller
   included do
     # needed for testing.
