@@ -1,0 +1,3 @@
+Description:
+  Generates a base_policy.rb and a stub for the fetch_roles method.  
+  rails g canner:fetch_roles
