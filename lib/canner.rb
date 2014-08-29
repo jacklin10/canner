@@ -1,5 +1,7 @@
 require 'active_support/core_ext/string'
 require "active_support/concern"
+require 'canner/policy'
+require 'canner/util'
 
 module Canner
 
@@ -7,7 +9,6 @@ module Canner
 
   # so you don't have to have a helper method in the app_controller
   included do
-    # needed for testing.
     if respond_to?(:helper_method)
       helper_method :canner_policy
       helper_method :canner_user
@@ -54,10 +55,12 @@ module Canner
     canner_policy(method_name, target_model).canner_scope
   end
 
+  # override this if your method for getting the current user isn't called current_user.
   def canner_user
     current_user
   end
 
+  # override this if your method for getting the current branch isn't called current_branch.
   def canner_branch
     current_branch
   end
@@ -77,7 +80,7 @@ module Canner
   end
 
   def canner_policy(method_name, target_model)
-    derive_class_name(target_model).constantize.new(canner_user, canner_branch, method_name)
+    derive_class_name(target_model).constantize.new(canner_user, method_name, canner_branch)
   end
 
   def derive_class_name(target_model)
