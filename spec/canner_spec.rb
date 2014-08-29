@@ -6,7 +6,7 @@ end
 
 class SamplePolicy
 
-  def initialize(current_user, current_branch, method)
+  def initialize(current_user, method, current_branch)
     @current_user = current_user
     @current_branch = current_branch
     @method = method.to_sym
@@ -33,7 +33,7 @@ describe Canner do
   let(:user) { double }
   let(:branch) { double }
   let(:app_controller) { AppController.new }
-  let(:sample_policy) {SamplePolicy.new(user, branch, 'index') }
+  let(:sample_policy) {SamplePolicy.new(user, 'index', branch) }
 
   describe "instance_can?" do
 
