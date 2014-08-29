@@ -1,5 +1,5 @@
 <% module_namespacing do -%>
-class <%= class_name %>Policy < BasePolicy
+class <%= class_name %>Policy < <%= parent_class_name %>
 
   def canner_scope
     case @method
