@@ -48,7 +48,11 @@ module Canner
     end
 
     def has_role?(roles)
-      @roles.any?{|r| Util.prepare(roles).include?(r.to_sym) }
+      begin
+        @roles.any?{|r| Util.prepare(roles).include?(r.to_sym) }
+      rescue Exception => e
+        raise ArgumentError.new "Canner: Problem fetching user roles. If current_user.roles isn't how you do it see wiki for overriding fetch_roles."
+      end
     end
 
   end
