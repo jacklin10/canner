@@ -9,11 +9,11 @@ module Canner
       @roles = fetch_roles
     end
 
-    # implement this in your policy class
+    # if you handle your roles differently you'll need to override.
+    # use: rails g canner:fetch_roles
     # expects an array or strings or symbols that represent the user roles
     def fetch_roles
-      raise ArgumentError.new("YOU NEED TO IMPLEMENT")
-      # ex. @current_user.roles
+      @current_user.roles
     end
 
     # implement in your policy class to auto scope in an action
