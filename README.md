@@ -1,5 +1,6 @@
-Canner
-======
+## Canner
+
+[![Code Climate](https://codeclimate.com/github/jacklin10/canner/badges/gpa.svg)](https://codeclimate.com/github/jacklin10/canner)
 
 Canner is an authorization gem heavily modeled after Pundit.  
 
