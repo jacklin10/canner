@@ -62,7 +62,7 @@ module Canner
 
   # override this if your method for getting the current branch isn't called current_branch.
   def canner_branch
-    current_branch
+    current_branch rescue nil
   end
 
   protected
