@@ -13,7 +13,7 @@ module Canner
     # use: rails g canner:fetch_roles
     # expects an array or strings or symbols that represent the user roles
     def fetch_roles
-      @current_user.roles
+      @current_user.nil? ? [] : @current_user.roles
     end
 
     # implement in your policy class to auto scope in an action
