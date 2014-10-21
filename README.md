@@ -1,5 +1,7 @@
-Canner
-======
+## Canner
+
+[![Code Climate](https://codeclimate.com/github/jacklin10/canner/badges/gpa.svg)](https://codeclimate.com/github/jacklin10/canner)
+[![Build Status](https://travis-ci.org/jacklin10/canner.svg?branch=master)](https://travis-ci.org/jacklin10/canner)
 
 Canner is an authorization gem heavily modeled after Pundit.  
 
@@ -144,7 +146,7 @@ else
   false
 end
 ```
-# Then in controller do:
+Then in controller do:
 ```can?(:something_random, :customer)```
 
 In english the can method is saying:
@@ -164,9 +166,9 @@ end
 
 in your base_policy's `can?` method
 
-### Force the Use of Policies
+### Forcing Controller Authorization
 
-Also like Pundit you can force your app to use policies.
+You are able to force the use of controller authorization with canner.  
 I recommend you do this so you don't forget to wrap authorization about some of your resources.
 
 To make sure your controller actions are using the can? method add this near the top of your
@@ -184,7 +186,7 @@ after_action :ensure_scope, only: :index
 Note the use of only here.  You usually won't need the canner_scope on anything except
 for the index to be strictly enforced.
 
-If you would like to skip for a particular controller just add
+If you would like to skip for a particular controller just add:
 ``` ruby
 skip_filter :ensure_scope
 ```
