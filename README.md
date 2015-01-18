@@ -3,6 +3,7 @@
 [![Code Climate](https://codeclimate.com/github/jacklin10/canner/badges/gpa.svg)](https://codeclimate.com/github/jacklin10/canner)
 [![Build Status](https://travis-ci.org/jacklin10/canner.svg?branch=master)](https://travis-ci.org/jacklin10/canner)
 [![Gem Version](https://badge.fury.io/rb/canner.svg)](http://badge.fury.io/rb/canner)
+
 Canner is an authorization gem heavily modeled after Pundit.  
 
 Canner's intention is to provide you a framework for authorization that has little to no magic.  
