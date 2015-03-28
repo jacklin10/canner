@@ -22,6 +22,7 @@ module Canner
 
   class AuthNotUsedError < StandardError; end
   class ScopeNotUsedError < StandardError; end
+  class InstanceNotProtectedError < StandardError; end
 
   def auth_used
     @auth_used ||= false
@@ -31,10 +32,15 @@ module Canner
     @scope_used ||= false
   end
 
+  def instance_checked
+    @instance_checked ||= false
+  end
+
   # method_name - The controller action method that you are concerned with access
   # target_model - Name of the object you are limiting access to. ( :user, :pet, :customer )
   # target_obj   - The instance obj for what you want to test.  ( does user 1 have access to company 1?)
   def instance_can?(method_name, target_model, target_obj)
+    @instance_checked = true
     policy = canner_policy(method_name, target_model)
     raise NotAuthorizedError.new("You do not have access to this #{target_model.to_s.humanize.capitalize}") unless policy.instance_can?(target_obj)
     true
@@ -76,6 +82,12 @@ module Canner
   def ensure_auth
     return if devise_controller? rescue false
     raise AuthNotUsedError.new("Must use can? method or exclude this action from the after_action") unless auth_used
+    true
+  end
+
+  def ensure_instance_checking
+    return if devise_controller? rescue false
+    raise AuthNotUsedError.new("Must use instance_can? method or exclude this action from the after_action") unless instance_checked
     true
   end
 
