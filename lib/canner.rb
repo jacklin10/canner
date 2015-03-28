@@ -36,7 +36,7 @@ module Canner
   # target_obj   - The instance obj for what you want to test.  ( does user 1 have access to company 1?)
   def instance_can?(method_name, target_model, target_obj)
     policy = canner_policy(method_name, target_model)
-    raise NotAuthorizedError.new("You do not have access to this #{target_model.capitalize}") unless policy.instance_can?(target_obj)
+    raise NotAuthorizedError.new("You do not have access to this #{target_model.to_s.humanize.capitalize}") unless policy.instance_can?(target_obj)
     true
   end
 
