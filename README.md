@@ -250,13 +250,17 @@ after_action :ensure_scope, only: :index
 Note the use of only here.  You usually won't need the canner_scope on anything except
 for the index to be strictly enforced.
 
-If you would like to skip for a particular controller just add:
+And finally, if you want to enforce that you are using instance_can? use something like: 
+``` ruby
+after_action :ensure_instance_checking, only: [:edit, :destroy, :update]
+```
+
+If you would like to skip one of the enforcements for a specific controller add one or all of these:
+
 ``` ruby
 skip_filter :ensure_scope
-```
-And / Or
-``` ruby
 skip_filter :ensure_auth
+skip_filter :ensure_instance_checking
 ```
 
 ### Handle Canner Authorization Failures
