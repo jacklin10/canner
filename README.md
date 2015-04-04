@@ -131,7 +131,7 @@ Also if your policy changes at some point its a one place fix.
 
 ### can?
 
-You use the can method to determine if the current_user is able to access an action or resource.
+You use the can? method to determine if the current_user is able to access an action or resource.
 
 The example above uses a straightforward case statement to determine if the current_user can
 access the current action or resource.
@@ -167,6 +167,70 @@ end
 
 in your base_policy's `can?` method
 
+### instance_can? 
+
+You use the instance_can? method to determine if the current_user is able to modify a particular instance
+of an object.  
+
+For example, if a user who belongs to company A wants to edit a particular item they maybe end up here:  
+
+```
+/items/3/edit
+```
+
+Normal stuff.  The user changes the item price and moves on.  
+
+But now we have another user who decides they want to see what happens when they manually change the url: 
+
+```
+/items/13/edit
+```
+
+If you don't defend against this the user would be granted access to edit item with id=13 which 
+belongs to a different company.  
+
+The instance_can? method helps in these situations.  
+
+In your items controller for the **edit, update and destroy** methods add something like:  
+
+``` ruby
+@item = Item.find params[:id]
+instance_can? :manage, :item, @item
+```
+
+Your item_policy.rb will have something like:  
+
+``` ruby
+def instance_can?(item)
+  case @method
+  when :manage
+    return @current_user.company == item.company
+  else
+    false
+  end
+end
+```
+
+Now if a user attempts to edit an item for another company they will see the canner access denied message.  
+
+Your policy can be more complex if needed.  Canner is just a framework so you can get as creative as you want
+just so long as you eventually return true or false.  
+
+For example, maybe your admin user is allowed to edit any items?  You could do something like this:  
+``` ruby
+def instance_can?(item)
+  case @method
+  when :manage
+    return has_role?(:admin) ? true : @current_user.company == item.company
+  else
+    false
+  end
+end
+```
+
+You can enforce that your methods check for this just like you can for canner_scope or can?.  
+See 'Forcing Controller Authorization'  
+
 ### Forcing Controller Authorization
 
 You are able to force the use of controller authorization with canner.  
@@ -187,13 +251,17 @@ after_action :ensure_scope, only: :index
 Note the use of only here.  You usually won't need the canner_scope on anything except
 for the index to be strictly enforced.
 
-If you would like to skip for a particular controller just add:
+And finally, if you want to enforce that you are using instance_can? use something like: 
+``` ruby
+after_action :ensure_instance_checking, only: [:edit, :destroy, :update]
+```
+
+If you would like to skip one of the enforcements for a specific controller add one or all of these:
+
 ``` ruby
 skip_filter :ensure_scope
-```
-And / Or
-``` ruby
 skip_filter :ensure_auth
+skip_filter :ensure_instance_checking
 ```
 
 ### Handle Canner Authorization Failures
