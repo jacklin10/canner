@@ -3,7 +3,7 @@ class Util
   # ensures whatever is passed in comes out an array of symbols
   class << self
     def prepare(str)
-      symbolize(arrayify(str))
+      symbolize(arrayify(str).flatten)
     end
 
     # ensures the array elements are symbols
@@ -13,9 +13,13 @@ class Util
 
     # ensure given roles are in the form of an array
     def arrayify(roles)
-      Array.wrap(roles).flatten
+      if roles.nil?
+        []
+      elsif roles.respond_to?(:to_ary)
+        roles.to_ary || [roles]
+      else
+        [roles]
+      end
     end
-
   end
-
 end
