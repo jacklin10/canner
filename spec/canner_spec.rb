@@ -4,7 +4,7 @@ require "canner"
 class Sample
 end
 
-class SamplePolicy
+class SamplePolicy < Canner::Policy
 
   def initialize(current_user, method, current_branch)
     @current_user = current_user
@@ -14,13 +14,21 @@ class SamplePolicy
   end
 
   def fetch_roles
-    # ['admin']
+    ['admin']
   end
 
   def canner_scope
-    # [Sample.new]
+    [Sample.new]
   end
 
+  def can?
+   case @method
+   when :index, :show
+     has_role?(:admin)
+   else
+     false
+   end
+  end
 end
 
 class AppController
