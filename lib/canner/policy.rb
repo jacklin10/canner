@@ -28,7 +28,7 @@ module Canner
       # end
     end
 
-    # implment in your policy class.
+    # implement in your policy class.
     # return true when the user can access the action or resource and false when they can't
     def can?
       raise ArgumentError.new("NOT IMPLEMENTED")
