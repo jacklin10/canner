@@ -63,7 +63,7 @@ describe Canner do
       expect(app_controller).to receive(:canner_policy).and_return(sample_policy)
       expect(sample_policy).to receive(:instance_can?).and_return true
 
-      app_controller.instance_can?('test', 'sample', Sample.new).should be_truthy
+      expect(app_controller.instance_can?('test', 'sample', Sample.new)).to be true
     end
 
   end
