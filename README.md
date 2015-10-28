@@ -55,7 +55,7 @@ need to override the fetch_roles policy method.
 rails g canner:fetch_roles
 ```
 
-More details are available in the wiki: 
+More details are available in the wiki:
 [Overriding the Fetching of Roles](https://github.com/jacklin10/canner/wiki/Feed-Roles)
 
 ## Policies
@@ -64,7 +64,7 @@ As mentioned Canner is strongly influenced by Pundit and is also based on Policy
 Your policy objects should be named using the following pattern:   
 UserPolicy, CustomerPolicy, AppPolicy.
 
-Use the generator to save you some time: 
+Use the generator to save you some time:
 ``` rails g canner:policy <model name> ```
 
 Your policy models need to implement 2 methods:
@@ -167,7 +167,7 @@ end
 
 in your base_policy's `can?` method
 
-### instance_can? 
+### instance_can?
 
 You use the instance_can? method to determine if the current_user is able to modify a particular instance
 of an object.  
@@ -180,13 +180,13 @@ For example, if a user who belongs to company A wants to edit a particular item 
 
 Normal stuff.  The user changes the item price and moves on.  
 
-But now we have another user who decides they want to see what happens when they manually change the url: 
+But now we have another user who decides they want to see what happens when they manually change the url:
 
 ```
 /items/13/edit
 ```
 
-If you don't defend against this the user would be granted access to edit item with id=13 which 
+If you don't defend against this the user would be granted access to edit item with id=13 which
 belongs to a different company.  
 
 The instance_can? method helps in these situations.  
@@ -258,7 +258,7 @@ after_action :ensure_scope, only: :index
 Note the use of only here.  You usually won't need the canner_scope on anything except
 for the index to be strictly enforced.
 
-And finally, if you want to enforce that you are using instance_can? use something like: 
+And finally, if you want to enforce that you are using instance_can? use something like:
 ``` ruby
 after_action :ensure_instance_checking, only: [:edit, :destroy, :update]
 ```
