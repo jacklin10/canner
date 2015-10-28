@@ -74,19 +74,16 @@ module Canner
   protected
 
   def ensure_scope
-    return if devise_controller? rescue false
     raise ScopeNotUsedError.new("Must use a canner_scope or exclude this action from the after_action") unless scope_used
     true
   end
 
   def ensure_auth
-    return if devise_controller? rescue false
     raise AuthNotUsedError.new("Must use can? method or exclude this action from the after_action") unless auth_used
     true
   end
 
   def ensure_instance_checking
-    return if devise_controller? rescue false
     raise AuthNotUsedError.new("Must use instance_can? method or exclude this action from the after_action") unless instance_checked
     true
   end

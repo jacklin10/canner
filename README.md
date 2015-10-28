@@ -237,10 +237,17 @@ You are able to force the use of controller authorization with canner.
 I recommend you do this so you don't forget to wrap authorization about some of your resources.
 
 To make sure your controller actions are using the can? method add this near the top of your
-application_controller.rb
+`application_controller.rb`.  Use the `except:` option for ensuring we ignore controllers
+related to authentication.
 
 ``` ruby
 after_action :ensure_auth
+
+# using devise?
+after_action :ensure_auth, except: :devise_controller?
+
+# using CASino?
+after_action :ensure_auth, except: -> { self.is_a? CASino::ApplicationController }
 ```
 
 And to make sure you are using the canner_scope do the following:
