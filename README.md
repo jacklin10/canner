@@ -247,7 +247,7 @@ after_action :ensure_auth
 after_action :ensure_auth, except: :devise_controller?
 
 # using CASino?
-after_action :ensure_auth, except: -> { self.is_a? CASino::ApplicationController }
+after_action :ensure_auth, unless: -> { self.is_a? CASino::SessionsController }
 ```
 
 And to make sure you are using the canner_scope do the following:
