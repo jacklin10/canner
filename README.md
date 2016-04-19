@@ -12,8 +12,7 @@ Your canner policies can be as simple or as complicated as your app requires.
 Who needs another auth gem?  There's a bunch of very good ones out there.  
 Pundit, cancan, cancancan and Declarative Authorization to name a few alternatives.  
 
-Unfortunately for me, none of those solutions had built in support for a requirement I have on the
-project [Kennel Captain](http://www.kennelcaptain.com)  
+Unfortunately for me, none of those solutions had built in support for a requirement I had.
 
 We need to authorize a user at a given store location, and that's a feature canner will support.
 
