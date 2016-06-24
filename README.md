@@ -14,7 +14,12 @@ Pundit, cancan, cancancan and Declarative Authorization to name a few alternativ
 
 Unfortunately for me, none of those solutions had built in support for a requirement I had.
 
-We need to authorize a user at a given store location, and that's a feature canner will support.
+I needed to authorize a user by more than just a role, I needed to authorize a user by role and location.  
+The other auth libraries out there don't support this requirement out of the box. 
+
+With canner you can ask:  Can *joe* having the role *manager* access the reports for the *pittsburgh* store.  
+
+You just have to let canner know the branch you are currently operating on.  
 
 For details see the wiki page [Authorize with Branches ( Store Locations )](https://github.com/jacklin10/canner/wiki/Authorize-with-Branches)
 
@@ -47,7 +52,7 @@ You'll then need to create a Policy class for the models you'd like to authorize
 rails g canner:policy user
 ```
 
-If your app gets roles from a user in a way other than @current_user.roles then you'll
+If your app gets roles from a user in a way other than ```@current_user.roles``` then you'll
 need to override the fetch_roles policy method.
 
 ```ruby
@@ -61,12 +66,19 @@ More details are available in the wiki:
 
 As mentioned Canner is strongly influenced by Pundit and is also based on Policy objects.
 Your policy objects should be named using the following pattern:   
-UserPolicy, CustomerPolicy, AppPolicy.
+```
+  <model_name>Policy.rb
+  i.e:  User.rb / UserPolicy.rb, Customer.rb / CustomerPolicy.rb
+```
 
-Use the generator to save you some time:
+#### Generator
+
+You can also use our generator to create the policy for you: 
+
 ``` rails g canner:policy <model name> ```
 
 Your policy models need to implement 2 methods:
+
 ``` ruby
 def canner_scope
 end
@@ -105,7 +117,7 @@ class CustomerPolicy < BasePolicy
   def canner_scope
     case @method
     when :index
-      User.where(company_id: @current_branch.company.id)
+      User.where(company_id: @current_branch.company_id)
     else
       User.none
     end
@@ -171,24 +183,25 @@ in your base_policy's `can?` method
 You use the instance_can? method to determine if the current_user is able to modify a particular instance
 of an object.  
 
-For example, if a user who belongs to company A wants to edit a particular item they maybe end up here:  
+For example, if a user wants to edit a particular item they may end up here:  
 
 ```
 /items/3/edit
 ```
 
-Normal stuff.  The user changes the item price and moves on.  
+The user changes the item price and moves on with their day.
 
-But now we have another user who decides they want to see what happens when they manually change the url:
+Now we have another user who decides they want to see what happens if they tinker with the url to potential edit other items.
+They enter the following:
 
 ```
 /items/13/edit
 ```
 
-If you don't defend against this the user would be granted access to edit item with id=13 which
-belongs to a different company.  
+Maybe item 13 belongs to a different company, or is in a cateogory that this user isn't supposed to see.
+If you don't defend against this situation a clever user can gain access to any item in the system.
 
-The instance_can? method helps in these situations.  
+The **instance_can?** method helps in these situations.  
 
 In your items controller for the **edit, update and destroy** methods add something like:  
 
@@ -203,14 +216,14 @@ Your item_policy.rb will have something like:
 def instance_can?(item)
   case @method
   when :manage
-    return @current_user.company == item.company
+    return @current_user.item_categories.include?(item.category)
   else
     false
   end
 end
 ```
 
-Now if a user attempts to edit an item for another company they will see the canner access denied message.  
+Now an access denied message will be shown to any users attempting to access an item in a category they don't belong to.
 
 Your policy can be more complex if needed.  Canner is just a framework so you can get as creative as you want
 just so long as you eventually return true or false.  
@@ -227,8 +240,8 @@ def instance_can?(item)
 end
 ```
 
-You can enforce that your methods check for this just like you can for canner_scope or can?.  
-See 'Forcing Controller Authorization'  
+You can enforce that your methods check for this just like you can for ```canner_scope``` or ```can?```.  
+The next section shows you how.
 
 ### Forcing Controller Authorization
 
@@ -249,7 +262,7 @@ after_action :ensure_auth, unless: :devise_controller?
 after_action :ensure_auth, unless: -> { self.is_a? CASino::SessionsController }
 ```
 
-And to make sure you are using the canner_scope do the following:
+And to make sure you are using the ```canner_scope``` do the following:
 ``` ruby
 after_action :ensure_scope, only: :index
 ```
