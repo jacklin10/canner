@@ -27,7 +27,7 @@ Also note that canner works fine if you don't need this particular feature, its 
 
 ## Installation
 
-I've only tested Canner on rails 4 but it should work find in rails 3.2 apps.
+I've only tested Canner on rails 4 but it should work fine in rails 3.2 apps.
 
 To install Canner just put the following in your gem file.
 ``` ruby
