@@ -25,6 +25,9 @@ For details see the wiki page [Authorize with Branches ( Store Locations )](http
 
 Also note that canner works fine if you don't need this particular feature, its just there if you do.
 
+## Compatability 
+Canner works with rails 4.x and 5.x.
+
 ## Installation
 
 I've only tested Canner on rails 4 but it should work fine in rails 3.2 apps.
