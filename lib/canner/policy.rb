@@ -49,7 +49,7 @@ module Canner
 
     # accepts array of string, symbols or a mix:  [:admin, 'guest']
     # also accepts a list of params as in has_role?(:admin, :guest)
-    def has_role?(check_roles)
+    def has_role?(*check_roles)
       begin
         @roles.any? do |r|
           user_role = r.respond_to?(:name) ? r.name : r.to_s
