@@ -59,11 +59,5 @@ module Canner
         raise ArgumentError.new "Canner: Problem fetching user roles. If current_user.roles isn't how you do it see wiki for overriding fetch_roles. #{e.message}"
       end
     end
-
-    protected
-
-    def is_method?(methods)
-      prepare(methods).include?(@method)
-    end
   end
 end
