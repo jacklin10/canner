@@ -1,28 +1,36 @@
 module Canner
-
   class Policy
-
     # current_user - The user whose access you are checking
     # current_branch - The optional 3rd access checking item.
-    #                  With branch you are saying can the user access this resource in this case.
     #                  For example, is Joe a manager at the Pittsburgh branch?
-    #                  He may be a manager in Pittsburgh, but not in Monaca so you need to know the branch.
-    # method         - The method the user is attempting to use. ex: :index, :create, :destroy, :custom_name
-    def initialize(current_user, method, current_branch=nil)
+    #                  He may be a manager in the burgh, but not in Monaca.
+    # method         - The controller method you are checking access to.
+    #                  ex: :index, :destroy, :custom_name
+    def initialize(current_user, method, current_branch = nil)
       @current_user = current_user
       @current_branch = current_branch
       @method = method.to_sym
       @roles = fetch_roles
     end
 
-    # if you handle your roles differently you'll need to override.
-    # use: rails g canner:fetch_roles
-    # It must return either an array of strings/symbols, or an array of Role objects that have a 'name' method.
+    # Return all the roles for the current user.
+    #
+    # This must return either:
+    # 1. Array of strings/symbols.  [:admin, :manager, :guest]
+    # 2. Array of objects that have a name method. [Role.new(name: 'admin')]
+    #
+    # If your user.roles method returns something else then you'll need to
+    # override this method.
+    # To easily override use the generator:
+    # rails g canner:fetch_roles
+    # Override case is if your user has permission objects like:
+    # { user_id: 1, name: 'admin', branch: 'Pittsburgh'}
+    # See github docs for examples.
     def fetch_roles
       @current_user.nil? ? [] : @current_user.roles
     end
 
-    # implement in your policy class to auto scope in an action
+    # Implement in your policy class to auto scope in an action
     def canner_scope
       raise ArgumentError, 'NOT IMPLEMENTED'
       # ex:
@@ -34,8 +42,8 @@ module Canner
       # end
     end
 
-    # implement in your policy class.
-    # return true when the user can access the action or resource and false when they can't
+    # Implement in your policy class.
+    # Return true when access is permitted, false when it isn't.
     def can?
       raise ArgumentError, 'NOT IMPLEMENTED'
       # ex:
@@ -47,16 +55,20 @@ module Canner
       # end
     end
 
-    # accepts array of string, symbols or a mix:  [:admin, 'guest']
+    # Used to determine if the user has any of the given roles.
+    #
+    # Accepts array of string, symbols or a mix:  has_role?[:admin, 'guest']
     # also accepts a list of params as in has_role?(:admin, :guest)
     def has_role?(*check_roles)
       begin
-        @roles.any? do |r|
-          user_role = r.respond_to?(:name) ? r.name : r.to_s
+        @roles.any? do |role|
+          user_role = role.respond_to?(:name) ? role.name : role.to_s
           Util.prepare(check_roles).include?(user_role.to_sym)
         end
       rescue StandardError => e
-        raise ArgumentError.new "Canner: Problem fetching user roles. If current_user.roles isn't how you do it see wiki for overriding fetch_roles. #{e.message}"
+        raise ArgumentError, 'Canner: Problem fetching user roles. ' \
+                             "If current_user.roles isn't how you do it " \
+                             "see wiki for overriding fetch_roles. #{e.message}"
       end
     end
   end
